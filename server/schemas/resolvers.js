@@ -3,10 +3,19 @@ const _ = require("lodash");
 const resolvers = {
   Query: {
     //user resolver
-    users: () => {
-      return UserList;
+    users: (parent, args ,context, info) => {
+      //  console.log(info);
+      if(UserList){
+        return {users: UserList};
+      }
+      else{
+        return {
+          message: "there is an error!!!"
+        }
+      }
+      
     },
-    user: (parents, args) => {
+    user: (parent, args ) => {
       const id = args.id;
       const user = _.find(UserList, { id: Number(id) });
       return user;
@@ -15,14 +24,15 @@ const resolvers = {
     movies: () => {
       return MovieList;
     },
-    movie: (parents, args) => {
+    movie: (parent, args) => {
       const name = args.name;
       const movie = _.find(MovieList, { name: name });
       return movie;
     },
   },
   User: {
-    favoriteMovies: () => {
+    favoriteMovies: (parent) => {
+      // console.log(parent)
       return _.filter(
         MovieList,
         (movie) =>
@@ -59,6 +69,19 @@ const resolvers = {
       return null;
     },
   },
+
+  UserResult: {
+    __resolveType(obj){
+      if(obj.users){
+        return "usersSuccessfullResult"
+      }
+      if(obj.message){
+        return "usersErrorResults"
+      }
+
+     return null;
+    }
+  }
 };
 
 module.exports = { resolvers };
